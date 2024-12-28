@@ -61,6 +61,7 @@ abstract class Book implements LibraryItem, Comparable<Book>, Cloneable {
     public String getTitle() { return title; }
     public String getAuthor() { return author.getName() + " " + author.getSurname(); }
     public int getYear() { return year; }
+    public Category getCategory() { return category; }  // Добавляем метод для получения категории
 
     @Override
     public void print() {
@@ -195,6 +196,7 @@ class Library {
         for (Book book : books) {
             if (book instanceof EBook) {
                 EBook eBook = (EBook) book;
+                // Используем getCategory() для получения категории
                 if (eBook.getCategory().getName().equalsIgnoreCase(categoryName)) {
                     eBook.print();
                     found = true;
