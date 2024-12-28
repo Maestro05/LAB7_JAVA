@@ -44,7 +44,7 @@ class Category {
 abstract class Book implements LibraryItem, Comparable<Book>, Cloneable {
     protected String title;
     protected Author author;
-    protected Category category;
+    protected Category category;  // Теперь категория обязательна
     protected int year;
     protected boolean isAvailable;
     protected boolean isReserved;
@@ -52,7 +52,7 @@ abstract class Book implements LibraryItem, Comparable<Book>, Cloneable {
     public Book(String title, Author author, Category category, int year) {
         this.title = title;
         this.author = author;
-        this.category = category;
+        this.category = category;  // Инициализация категории
         this.year = year;
         this.isAvailable = true;
         this.isReserved = false;
@@ -61,11 +61,11 @@ abstract class Book implements LibraryItem, Comparable<Book>, Cloneable {
     public String getTitle() { return title; }
     public String getAuthor() { return author.getName() + " " + author.getSurname(); }
     public int getYear() { return year; }
-    public Category getCategory() { return category; }  // Добавляем метод для получения категории
+    public Category getCategory() { return category; }  // Метод для получения категории
 
     @Override
     public void print() {
-        System.out.println("Книга: " + title + ", Автор: " + getAuthor() + ", Год: " + year);
+        System.out.println("Книга: " + title + ", Автор: " + getAuthor() + ", Год: " + year + ", Категория: " + category.getName());
     }
 
     // Реализация интерфейса Comparable для сортировки
@@ -194,13 +194,9 @@ class Library {
     public void printBooksByCategory(String categoryName) {
         boolean found = false;
         for (Book book : books) {
-            if (book instanceof EBook) {
-                EBook eBook = (EBook) book;
-                // Используем getCategory() для получения категории
-                if (eBook.getCategory().getName().equalsIgnoreCase(categoryName)) {
-                    eBook.print();
-                    found = true;
-                }
+            if (book.getCategory().getName().equalsIgnoreCase(categoryName)) {
+                book.print();
+                found = true;
             }
         }
         if (!found) {
