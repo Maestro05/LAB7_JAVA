@@ -1,3 +1,5 @@
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -181,8 +183,9 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        
 
+        Scanner scanner = new Scanner(new InputStreamReader(System.in, Charset.forName("Cp866")));
         // Создание объектов для главных блюд
         MainDish[] mainDishes = {
             new MainDish("Борщ", 150),
