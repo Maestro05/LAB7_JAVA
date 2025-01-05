@@ -187,6 +187,7 @@ public class Main {
 
         Scanner scanner = new Scanner(new InputStreamReader(System.in, Charset.forName("Cp866")));
         // Создание объектов для главных блюд
+    
         MainDish[] mainDishes = {
             new MainDish("Борщ", 150),
             new MainDish("Стейк", 300),
