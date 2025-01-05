@@ -1,38 +1,24 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
 
-// Интерфейс для книг
-interface LibraryItem {
-    String getTitle();
-    String getAuthor();
-    int getYear();
-    void print();
-}
+// Базовый класс для всех элементов меню
+class MenuItem {
+    String name;    // Название блюда
+    double price;   // Цена блюда
 
-// Класс для автора
-class Author {
-    private String name;
-    private String surname;
-
-    public Author(String name, String surname) {
+    public MenuItem(String name, double price) {
         this.name = name;
-        this.surname = surname;
+        this.price = price;
     }
 
-    public String getName() {
-        return name;
+    public void display() {
+        System.out.println(name + " - " + price + " руб.");
     }
 
-    public String getSurname() {
-        return surname;
-    }
-}
-
-// Класс для категории
-class Category {
-    private String name;
-
-    public Category(String name) {
-        this.name = name;
+    public double getPrice() {
+        return price;
     }
 
     public String getName() {
@@ -40,291 +26,302 @@ class Category {
     }
 }
 
-// Абстрактный класс для книги
-abstract class Book implements LibraryItem, Comparable<Book>, Cloneable {
-    protected String title;
-    protected Author author;
-    protected Category category;  // Теперь категория обязательна
-    protected int year;
-    protected boolean isAvailable;
-    protected boolean isReserved;
-
-    public Book(String title, Author author, Category category, int year) {
-        this.title = title;
-        this.author = author;
-        this.category = category;  // Инициализация категории
-        this.year = year;
-        this.isAvailable = true;
-        this.isReserved = false;
+// Классы для каждого типа блюда
+class MainDish extends MenuItem {
+    public MainDish(String name, double price) {
+        super(name, price);
     }
-
-    public String getTitle() { return title; }
-    public String getAuthor() { return author.getName() + " " + author.getSurname(); }
-    public int getYear() { return year; }
-    public Category getCategory() { return category; }  // Метод для получения категории
 
     @Override
-    public void print() {
-        System.out.println("Книга: " + title + ", Автор: " + getAuthor() + ", Год: " + year + ", Категория: " + category.getName());
-    }
-
-    // Реализация интерфейса Comparable для сортировки
-    @Override
-    public int compareTo(Book other) {
-        return this.title.compareTo(other.title); // Сортировка по названию
-    }
-
-    // Клонирование
-    @Override
-    public Book clone() throws CloneNotSupportedException {
-        return (Book) super.clone();
-    }
-
-    public boolean isAvailable() {
-        return isAvailable;
-    }
-
-    public void setAvailable(boolean available) {
-        isAvailable = available;
-    }
-
-    public boolean isReserved() {
-        return isReserved;
-    }
-
-    public void setReserved(boolean reserved) {
-        isReserved = reserved;
+    public void display() {
+        System.out.print("[Главное блюдо] ");
+        super.display();
     }
 }
 
-// Класс для электронной книги (производный класс)
-class EBook extends Book {
-    private String fileFormat;
-    private double fileSize;
-
-    public EBook(String title, Author author, Category category, int year, String fileFormat, double fileSize) {
-        super(title, author, category, year);
-        this.fileFormat = fileFormat;
-        this.fileSize = fileSize;
+class Appetizer extends MenuItem {
+    public Appetizer(String name, double price) {
+        super(name, price);
     }
 
     @Override
-    public void print() {
-        super.print();
-        System.out.println("Формат файла: " + fileFormat + ", Размер: " + fileSize + " MB");
+    public void display() {
+        System.out.print("[Закуска] ");
+        super.display();
     }
 }
 
-// Класс для библиотеки
-class Library {
-    private List<Book> books;
-
-    public Library() {
-        this.books = new ArrayList<>();
+class Drink extends MenuItem {
+    public Drink(String name, double price) {
+        super(name, price);
     }
 
-    // Добавление книги в библиотеку
-    public void addBook(Book book) {
-        books.add(book);
-        System.out.println("Книга \"" + book.getTitle() + "\" добавлена в библиотеку.");
-    }
-
-    // Поиск книги по названию
-    public Book searchByTitle(String title) {
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title)) {
-                return book;
-            }
-        }
-        return null;
-    }
-
-    // Сортировка книг по названию
-    public void sortBooks() {
-        Collections.sort(books);
-        System.out.println("Книги отсортированы.");
-    }
-
-    // Резервирование книги
-    public boolean reserveBook(Book book) {
-        if (book.isAvailable() && !book.isReserved()) {
-            book.setReserved(true);
-            System.out.println("Книга \"" + book.getTitle() + "\" зарезервирована.");
-            return true;
-        }
-        System.out.println("Книга \"" + book.getTitle() + "\" недоступна для резервирования.");
-        return false;
-    }
-
-    // Выдача книги
-    public boolean lendBook(Book book) {
-        if (book.isAvailable() && !book.isReserved()) {
-            book.setAvailable(false);
-            System.out.println("Книга \"" + book.getTitle() + "\" выдана.");
-            return true;
-        }
-        System.out.println("Книга \"" + book.getTitle() + "\" недоступна для выдачи.");
-        return false;
-    }
-
-    // Возврат книги
-    public boolean returnBook(Book book) {
-        if (!book.isAvailable()) {
-            book.setAvailable(true);
-            book.setReserved(false);  // Снять резерв
-            System.out.println("Книга \"" + book.getTitle() + "\" возвращена в библиотеку.");
-            return true;
-        }
-        System.out.println("Книга \"" + book.getTitle() + "\" уже в библиотеке.");
-        return false;
-    }
-
-    // Вывод всех книг в библиотеке
-    public void printBooks() {
-        if (books.isEmpty()) {
-            System.out.println("Библиотека пуста.");
-        } else {
-            for (Book book : books) {
-                book.print();
-            }
-        }
-    }
-
-    // Вывод книг по категориям
-    public void printBooksByCategory(String categoryName) {
-        boolean found = false;
-        for (Book book : books) {
-            if (book.getCategory().getName().equalsIgnoreCase(categoryName)) {
-                book.print();
-                found = true;
-            }
-        }
-        if (!found) {
-            System.out.println("Нет книг в категории \"" + categoryName + "\".");
-        }
+    @Override
+    public void display() {
+        System.out.print("[Напиток] ");
+        super.display();
     }
 }
 
-// Главный класс для тестирования программы
+class Dessert extends MenuItem {
+    public Dessert(String name, double price) {
+        super(name, price);
+    }
+
+    @Override
+    public void display() {
+        System.out.print("[Десерт] ");
+        super.display();
+    }
+}
+
+// Вспомогательный класс для возврата информации о заказе
+class OrderInfo {
+    private double totalPrice;
+
+    public OrderInfo(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+}
+
+// Класс для обработки заказа
+class Order {
+    List<MenuItem> items = new ArrayList<>();  // Список заказанных позиций
+    private static int orderCount = 0;  // Статическое поле для подсчета заказов
+    private int orderNumber; // Номер текущего заказа
+
+    public Order() {
+        this.orderNumber = ++orderCount; // Инкрементируем счетчик заказов при создании нового объекта
+    }
+
+    public void addItem(MenuItem item) {
+        items.add(item);
+    }
+
+    public void displayOrder() {
+        double total = 0;
+        System.out.println("\nВаш заказ #" + orderNumber + ":");
+        for (MenuItem item : items) {
+            item.display();
+            total += item.getPrice();
+        }
+        System.out.println("Общая сумма: " + total + " руб.");
+        OrderInfo orderInfo = new OrderInfo(total);
+        System.out.println("Общая стоимость: " + orderInfo.getTotalPrice());
+    }
+
+    // Статический метод для получения количества заказов
+    public static int getOrderCount() {
+        return orderCount;
+    }
+
+    // Метод для очистки текущего заказа
+    public void clearOrder() {
+        items.clear();
+    }
+
+    // Получить номер заказа
+    public int getOrderNumber() {
+        return orderNumber;
+    }
+}
+
 public class Main {
+
+    // Метод для отображения главного меню
+    public static void displayMenu() {
+        System.out.println("\nВыберите категорию меню:");
+        System.out.println("1. Главное блюдо");
+        System.out.println("2. Закуски");
+        System.out.println("3. Напитки");
+        System.out.println("4. Десерты");
+        System.out.println("5. Завершить заказ");
+        System.out.println("6. Поиск продукта по названию");
+        System.out.println("7. Выход из программы");
+        System.out.print("Введите номер категории: ");
+    }
+
+    // Метод для отображения главных блюд
+    public static void displayMainDishes() {
+        System.out.println("\nГлавные блюда:");
+        System.out.println("1. Борщ - 150 руб.");
+        System.out.println("2. Стейк - 300 руб.");
+        System.out.println("3. Пельмени - 180 руб.");
+        System.out.println("4. Ризотто - 220 руб.");
+    }
+
+    // Метод для отображения закусок
+    public static void displayAppetizers() {
+        System.out.println("\nЗакуски:");
+        System.out.println("1. Салат Цезарь - 120 руб.");
+        System.out.println("2. Оливье - 100 руб.");
+        System.out.println("3. Блины с икрой - 150 руб.");
+        System.out.println("4. Тосты с авокадо - 110 руб.");
+    }
+
+    // Метод для отображения напитков
+    public static void displayDrinks() {
+        System.out.println("\nНапитки:");
+        System.out.println("1. Кола - 50 руб.");
+        System.out.println("2. Минеральная вода - 40 руб.");
+        System.out.println("3. Сок апельсиновый - 70 руб.");
+        System.out.println("4. Чай черный - 60 руб.");
+    }
+
+    // Метод для отображения десертов
+    public static void displayDesserts() {
+        System.out.println("\nДесерты:");
+        System.out.println("1. Торт Наполеон - 80 руб.");
+        System.out.println("2. Мороженое - 60 руб.");
+        System.out.println("3. Чизкейк - 120 руб.");
+        System.out.println("4. Пирог с яблоками - 90 руб.");
+    }
+
     public static void main(String[] args) {
-        Library library = new Library();
-
-        // Создание авторов и категорий
-        Author author1 = new Author("John", "Doe");
-        Author author2 = new Author("Jane", "Smith");
-        Category category1 = new Category("Programming");
-        Category category2 = new Category("Fiction");
-
-        // Создание книг
-        Book book1 = new Book("Java Programming", author1, category1, 2023) {};
-        Book book2 = new EBook("The Hobbit", author2, category2, 1937, "EPUB", 2.3);
-
-        // Добавление книг в библиотеку
-        library.addBook(book1);
-        library.addBook(book2);
-
-        // Меню
         Scanner scanner = new Scanner(System.in);
-        int choice;
-        do {
-            System.out.println("\nМеню:");
-            System.out.println("1. Добавить книгу");
-            System.out.println("2. Выдать книгу");
-            System.out.println("3. Резервировать книгу");
-            System.out.println("4. Вернуть книгу");
-            System.out.println("5. Найти книгу по названию");
-            System.out.println("6. Сортировать книги");
-            System.out.println("7. Вывести все книги");
-            System.out.println("8. Вывести книги по категории");
-            System.out.println("9. Выход");
-            System.out.print("Выберите действие: ");
-            choice = scanner.nextInt();
-            scanner.nextLine(); // Очистка буфера ввода
 
-            switch (choice) {
-                case 1:
-                    // Добавление книги
-                    System.out.print("Введите название книги: ");
-                    String title = scanner.nextLine();
-                    System.out.print("Введите имя автора: ");
-                    String authorName = scanner.nextLine();
-                    System.out.print("Введите фамилию автора: ");
-                    String authorSurname = scanner.nextLine();
-                    System.out.print("Введите категорию: ");
-                    String category = scanner.nextLine();
-                    System.out.print("Введите год издания: ");
-                    int year = scanner.nextInt();
-                    library.addBook(new Book(title, new Author(authorName, authorSurname), new Category(category), year) {});
-                    break;
-                case 2:
-                    // Выдача книги
-                    System.out.print("Введите название книги для выдачи: ");
-                    String lendTitle = scanner.nextLine();
-                    Book lendBook = library.searchByTitle(lendTitle);
-                    if (lendBook != null) {
-                        library.lendBook(lendBook);
+        // Создание объектов для главных блюд
+        MainDish[] mainDishes = {
+            new MainDish("Борщ", 150),
+            new MainDish("Стейк", 300),
+            new MainDish("Пельмени", 180),
+            new MainDish("Ризотто", 220)
+        };
+
+        // Создание объектов для закусок
+        Appetizer[] appetizers = {
+            new Appetizer("Салат Цезарь", 120),
+            new Appetizer("Оливье", 100),
+            new Appetizer("Блины с икрой", 150),
+            new Appetizer("Тосты с авокадо", 110)
+        };
+
+        // Создание объектов для напитков
+        Drink[] drinks = {
+            new Drink("Кола", 50),
+            new Drink("Минеральная вода", 40),
+            new Drink("Сок апельсиновый", 70),
+            new Drink("Чай черный", 60)
+        };
+
+        // Создание объектов для десертов
+        Dessert[] desserts = {
+            new Dessert("Торт Наполеон", 80),
+            new Dessert("Мороженое", 60),
+            new Dessert("Чизкейк", 120),
+            new Dessert("Пирог с яблоками", 90)
+        };
+
+        // Контейнер для хранения всех блюд
+        List<MenuItem> menuItems = new ArrayList<>();
+        Collections.addAll(menuItems, mainDishes);
+        Collections.addAll(menuItems, appetizers);
+        Collections.addAll(menuItems, drinks);
+        Collections.addAll(menuItems, desserts);
+
+        boolean exit = false;
+        Order currentOrder = null;
+
+        while (!exit) {
+            displayMenu();
+
+            int category = scanner.nextInt();
+
+            switch (category) {
+                case 1: {
+                    // Главное блюдо
+                    displayMainDishes();
+                    System.out.print("Выберите главное блюдо (1-4): ");
+                    int choice = scanner.nextInt();
+                    if (choice >= 1 && choice <= 4) {
+                        if (currentOrder == null) currentOrder = new Order();
+                        currentOrder.addItem(mainDishes[choice - 1]);
                     } else {
-                        System.out.println("Книга не найдена.");
+                        System.out.println("Некорректный выбор!");
                     }
                     break;
-                case 3:
-                    // Резервирование книги
-                    System.out.print("Введите название книги для резервирования: ");
-                    String reserveTitle = scanner.nextLine();
-                    Book reserveBook = library.searchByTitle(reserveTitle);
-                    if (reserveBook != null) {
-                        library.reserveBook(reserveBook);
+                }
+                case 2: {
+                    // Закуски
+                    displayAppetizers();
+                    System.out.print("Выберите закуску (1-4): ");
+                    int choice = scanner.nextInt();
+                    if (choice >= 1 && choice <= 4) {
+                        if (currentOrder == null) currentOrder = new Order();
+                        currentOrder.addItem(appetizers[choice - 1]);
                     } else {
-                        System.out.println("Книга не найдена.");
+                        System.out.println("Некорректный выбор!");
                     }
                     break;
-                case 4:
-                    // Возврат книги
-                    System.out.print("Введите название книги для возврата: ");
-                    String returnTitle = scanner.nextLine();
-                    Book returnBook = library.searchByTitle(returnTitle);
-                    if (returnBook != null) {
-                        library.returnBook(returnBook);
+                }
+                case 3: {
+                    // Напитки
+                    displayDrinks();
+                    System.out.print("Выберите напиток (1-4): ");
+                    int choice = scanner.nextInt();
+                    if (choice >= 1 && choice <= 4) {
+                        if (currentOrder == null) currentOrder = new Order();
+                        currentOrder.addItem(drinks[choice - 1]);
                     } else {
-                        System.out.println("Книга не найдена.");
+                        System.out.println("Некорректный выбор!");
                     }
                     break;
-                case 5:
-                    // Поиск книги по названию
-                    System.out.print("Введите название книги для поиска: ");
-                    String searchTitle = scanner.nextLine();
-                    Book foundBook = library.searchByTitle(searchTitle);
-                    if (foundBook != null) {
-                        foundBook.print();
+                }
+                case 4: {
+                    // Десерты
+                    displayDesserts();
+                    System.out.print("Выберите десерт (1-4): ");
+                    int choice = scanner.nextInt();
+                    if (choice >= 1 && choice <= 4) {
+                        if (currentOrder == null) currentOrder = new Order();
+                        currentOrder.addItem(desserts[choice - 1]);
                     } else {
-                        System.out.println("Книга не найдена.");
+                        System.out.println("Некорректный выбор!");
                     }
                     break;
-                case 6:
-                    // Сортировка книг
-                    library.sortBooks();
+                }
+                case 5: {
+                    // Завершить заказ и перейти к следующему
+                    if (currentOrder != null) {
+                        currentOrder.displayOrder();
+                        currentOrder = null; // Очистить текущий заказ
+                    } else {
+                        System.out.println("Нет текущего заказа!");
+                    }
                     break;
-                case 7:
-                    // Вывод всех книг
-                    library.printBooks();
+                }
+                case 6: {
+                    // Поиск продукта по названию
+                    System.out.print("Введите название продукта: ");
+                    String searchName = scanner.next();
+                    boolean found = false;
+                    for (MenuItem item : menuItems) {
+                        if (item.getName().toLowerCase().contains(searchName.toLowerCase())) {
+                            item.display();
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        System.out.println("Продукт не найден!");
+                    }
                     break;
-                case 8:
-                    // Вывод книг по категории
-                    System.out.print("Введите категорию для поиска книг: ");
-                    String categorySearch = scanner.nextLine();
-                    library.printBooksByCategory(categorySearch);
-                    break;
-                case 9:
+                }
+                case 7: {
                     // Выход из программы
-                    System.out.println("Выход из программы...");
+                    exit = true;
                     break;
+                }
                 default:
-                    System.out.println("Неверный выбор. Попробуйте снова.");
+                    System.out.println("Некорректный выбор. Попробуйте снова.");
                     break;
             }
-        } while (choice != 9);
+        }
 
-        scanner.close();
+        // Вывод количества заказов после выхода из программы
+        System.out.println("Всего сделано заказов: " + Order.getOrderCount());
     }
 }
