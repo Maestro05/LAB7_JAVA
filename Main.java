@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Comparator;
 
 // Базовый класс для всех элементов меню
 class MenuItem {
@@ -100,6 +101,17 @@ class Order {
 
     public void addItem(MenuItem item) {
         items.add(item);
+        sortItemsByPrice();  // Сортировка списка товаров по цене после добавления нового
+    }
+
+    // Метод для сортировки блюд по цене
+    private void sortItemsByPrice() {
+        Collections.sort(items, new Comparator<MenuItem>() {
+            @Override
+            public int compare(MenuItem item1, MenuItem item2) {
+                return Double.compare(item1.getPrice(), item2.getPrice());  // Сортировка по цене
+            }
+        });
     }
 
     public void displayOrder() {
